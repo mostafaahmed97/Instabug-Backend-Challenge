@@ -12,7 +12,25 @@ services:
       - "3306:3306"
     volumes:
       - chat_system_vol:/var/lib/mysql
+  redis:
+    image: redis:7.4.0-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - chat_system_redis_vol:/data
+
+  redis-insight:
+    image: redis/redisinsight:2.54
+    container_name: redis-insight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    
 
 volumes:
   chat_system_vol:
+    driver: local
+  chat_system_redis_vol:
     driver: local
