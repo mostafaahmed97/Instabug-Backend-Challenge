@@ -1,5 +1,5 @@
 class ChatsController < ApplicationController
-  before_action :find_application, only: [:index, :show, :destroy]
+  before_action :find_application, only: [:index, :show, :destroy, :create]
   before_action :find_chat, only: [:show, :destroy]
 
   def index
@@ -14,7 +14,22 @@ class ChatsController < ApplicationController
   end
 
   def create
-    render json: {message: "WIP"}
+    latest_chat_number = @application.chat.maximum(:number) || 0
+    queued_chats = $redis.incr("queued_chats_count_#{@application.token}")
+
+    new_chat_number = latest_chat_number + queued_chats
+
+    payload = {
+      application_id: @application.id,
+      number: new_chat_number
+    }
+
+    $redis.rpush("queued_chats", payload)
+
+    render json: {
+      number: new_chat_number,
+      messages_count: 0
+    }
   end
 
   def destroy
