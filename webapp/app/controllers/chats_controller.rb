@@ -10,12 +10,7 @@ class ChatsController < ApplicationController
   end
 
   def show
-    chat = Chat.where(application_id: @application.id, number: params[:number])
-    if chat
-      render json: chat.as_json, except: [:id]
-    else
-      render json: {error: "No such chat"}, status: :not_found
-    end
+    render json: @chat.as_json, except: [:id]
   end
 
   def create
