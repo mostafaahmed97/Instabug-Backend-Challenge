@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: mysql:8.4
+    container_name: db-1
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chat_system_db
@@ -12,6 +13,14 @@ services:
       - "3306:3306"
     volumes:
       - chat_system_vol:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
   redis:
     image: redis:7.4.0-alpine
     container_name: redis
@@ -27,6 +36,13 @@ services:
       - "5540:5540"
     depends_on:
       - redis
+    
+  rabbitmq:
+    image: rabbitmq:4.0-rc-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     
 
 volumes:
