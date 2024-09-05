@@ -6,11 +6,11 @@ class ChatsController < ApplicationController
     puts "finding chats for #{ @application.id.to_s }"
     puts @application.token.to_s
     chats = Chat.where(application_id: @application.id)
-    render json: chats.as_json, except: [:id]
+    render json: chats.as_json(except: [:id, :application_id])
   end
 
   def show
-    render json: @chat.as_json, except: [:id]
+    render json: @chat.as_json(except: [:id, :application_id])
   end
 
   def create
