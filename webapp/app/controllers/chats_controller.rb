@@ -1,10 +1,10 @@
+require 'json'
+
 class ChatsController < ApplicationController
   before_action :find_application, only: [:index, :show, :destroy, :create]
   before_action :find_chat, only: [:show, :destroy]
 
   def index
-    puts "finding chats for #{ @application.id.to_s }"
-    puts @application.token.to_s
     chats = Chat.where(application_id: @application.id)
     render json: chats.as_json(except: [:id, :application_id])
   end
@@ -14,17 +14,14 @@ class ChatsController < ApplicationController
   end
 
   def create
-    latest_chat_number = @application.chat.maximum(:number) || 0
-    queued_chats = $redis.incr("queued_chats_count_#{@application.token}")
-
-    new_chat_number = latest_chat_number + queued_chats
+    new_chat_number = $redis.incr("chats_count_#{@application.token}")
 
     payload = {
       application_id: @application.id,
       number: new_chat_number
     }
 
-    $redis.rpush("queued_chats", payload)
+    EventPublisher.publish(JSON.generate(payload), $CHATS_QUEUE)
 
     render json: {
       number: new_chat_number,
