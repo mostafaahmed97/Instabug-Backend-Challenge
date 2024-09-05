@@ -32,6 +32,10 @@ class ChatsController < ApplicationController
     }
   end
 
+  def update
+    render body: nil, status: :method_not_allowed
+  end
+
   def destroy
     @chat.destroy
     render body: nil, status: :no_content
