@@ -23,6 +23,8 @@ gem "mysql2", ">= 0.5.6"
 gem "bunny"
 gem "sneakers"
 gem "rufus-scheduler"
+gem "elasticsearch-model"
+gem "elasticsearch-rails"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"

@@ -6,7 +6,12 @@ class MessagesController < ApplicationController
 
 
   def index
-    messages = Message.where(chat_id: @chat.id)
+    if params[:text]
+      messages = Message.search(params[:text], @chat.id)
+    else
+      messages = Message.where(chat_id: @chat.id)
+    end
+
     render json: messages.as_json(except: [:id, :chat_id])
   end
 
