@@ -19,7 +19,7 @@ class MessagesController < ApplicationController
     new_msg_number = $redis.incr("msgs_count_#{@application.token}_#{@chat.number}")
 
     payload = {
-      chat_id: @application.id,
+      chat_id: @chat.id,
       number: new_msg_number,
       text: text
     }
