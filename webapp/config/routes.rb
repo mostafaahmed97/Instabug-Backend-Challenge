@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   # This hooks the CRUD methods of Application controller to routes
   # param: token changes parameter of URL to /:token instead of /:id
   resources :applications, param: :token do
-    resources :chats, param: :number
+    resources :chats, param: :number do
+      resources :messages, param: :number
+    end
   end
 end

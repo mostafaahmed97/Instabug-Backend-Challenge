@@ -40,7 +40,9 @@ class ChatsController < ApplicationController
 
   private
   def find_application
-    @application = Application.find_by(token: params[:application_token])
+    @application = Application.find_by(
+      token: params[:application_token]
+    )
 
     unless @application
       render json: { error: "Application not found" }, status: :not_found
