@@ -56,6 +56,8 @@ services:
       - xpack.security.enabled=false
       # To resolve virtual memory allocation limits on startup
       - discovery.type=single-node
+    volumes:
+      - chat_system_es_vol:/usr/share/elasticsearch/data
 
   kibana:
     image: kibana:8.15.1
@@ -69,4 +71,6 @@ volumes:
   chat_system_vol:
     driver: local
   chat_system_redis_vol:
+    driver: local
+  chat_system_es_vol:
     driver: local
