@@ -1,27 +1,5 @@
 version: '3.8'
 
-x-db-config: &DB_CONFIG
-  DB_HOST: db
-  DB_USER: admin
-  DB_PASSWORD: admin
-  DB_NAME: chat_system_db
-  DB_PORT: 3306
-
-x-redis-config: &REDIS_CONFIG
-  REDIS_HOST: redis
-  REDIS_PORT: 6379
-
-x-elasticsearch-config: &ELASTICSEARCH_CONFIG
-  ES_HOST: elasticsearch
-  ES_PORT: 9200
-
-x-rabbitmq-config: &RABBITMQ_CONFIG
-  RABBITMQ_HOST: rabbitmq
-  RABBITMQ_PORT: 5672
-  RABBITMQ_USER: guest
-  RABBITMQ_PASSWORD: guest
-
-
 services:
   app:
     build: ./webapp
@@ -35,10 +13,22 @@ services:
       timeout: 30s
       retries: 5
     environment:
-      <<: *DB_CONFIG
-      <<: *ELASTICSEARCH_CONFIG
-      <<: *RABBITMQ_CONFIG
-      <<: *REDIS_CONFIG
+      DB_HOST: db
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: chat_system_db
+      DB_PORT: 3306
+
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
     depends_on:
       rabbitmq:
@@ -55,10 +45,22 @@ services:
     container_name: worker
     command: "bash ./init-worker.sh"
     environment:
-      <<: *DB_CONFIG
-      <<: *ELASTICSEARCH_CONFIG
-      <<: *RABBITMQ_CONFIG
-      <<: *REDIS_CONFIG
+      DB_HOST: db
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: chat_system_db
+      DB_PORT: 3306
+
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
     depends_on:
       app:
