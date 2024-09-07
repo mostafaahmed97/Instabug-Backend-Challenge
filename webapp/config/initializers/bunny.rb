@@ -3,10 +3,9 @@
 $CHATS_QUEUE = 'chats'
 $MESSAGES_QUEUE = 'messages'
 
-# TODO: Update with env var
 $bunny = Bunny.new(
-  :host => '127.0.0.1',
-  :port => 5672,
+  :host => ENV["RABBITMQ_HOST"],
+  :port => ENV["RABBITMQ_PORT"],
   automatically_recover: true
 )
 

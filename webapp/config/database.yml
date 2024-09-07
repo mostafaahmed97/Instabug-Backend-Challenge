@@ -3,18 +3,17 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
 
-  database: <%#= ENV['DB_NAME'] %>
-  username: <%#= ENV['DB_USER'] %>
-  password: <%#= ENV['DB_PASSWORD'] %>
-  host: <%#= ENV['DB_HOST'] %>
-  port: 3306
+  database: <%= ENV.fetch("DB_NAME") %>
+  username: <%= ENV.fetch("DB_USER") %>
+  password: <%= ENV.fetch("DB_PASSWORD") %>
+  host: <%= ENV.fetch("DB_HOST") %>
+  port: <%= ENV.fetch("DB_PORT") %>
 
 development:
   <<: *default
 
 test:
   <<: *default
-
 
 production:
   <<: *default

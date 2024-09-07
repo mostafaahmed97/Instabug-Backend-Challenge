@@ -1,19 +1,87 @@
 version: '3.8'
 
+x-db-config: &DB_CONFIG
+  DB_HOST: db
+  DB_USER: admin
+  DB_PASSWORD: admin
+  DB_NAME: chat_system_db
+  DB_PORT: 3306
+
+x-redis-config: &REDIS_CONFIG
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+x-elasticsearch-config: &ELASTICSEARCH_CONFIG
+  ES_HOST: elasticsearch
+  ES_PORT: 9200
+
+x-rabbitmq-config: &RABBITMQ_CONFIG
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: 5672
+  RABBITMQ_USER: guest
+  RABBITMQ_PASSWORD: guest
+
+
 services:
+  app:
+    build: ./webapp
+    container_name: app
+    command: "bash ./init.sh"
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:3000/up || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+    environment:
+      <<: *DB_CONFIG
+      <<: *ELASTICSEARCH_CONFIG
+      <<: *RABBITMQ_CONFIG
+      <<: *REDIS_CONFIG
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+
+  worker:
+    build: ./webapp
+    container_name: worker
+    command: "bash ./init-worker.sh"
+    environment:
+      <<: *DB_CONFIG
+      <<: *ELASTICSEARCH_CONFIG
+      <<: *RABBITMQ_CONFIG
+      <<: *REDIS_CONFIG
+
+    depends_on:
+      app:
+        condition: service_healthy
+
   db:
     image: mysql:8.4
-    container_name: db-1
+    container_name: db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chat_system_db
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 30s
+      timeout: 30s
+      retries: 5
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
-      - chat_system_vol:/var/lib/mysql
+      - chat_system_db_vol:/var/lib/mysql
 
   adminer:
     image: adminer
@@ -27,7 +95,7 @@ services:
     container_name: redis
     restart: always
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - chat_system_redis_vol:/data
 
@@ -35,23 +103,34 @@ services:
     image: redis/redisinsight:2.54
     container_name: redis-insight
     ports:
-      - "5540:5540"
+      - '5540:5540'
     depends_on:
       - redis
-    
+
   rabbitmq:
     image: rabbitmq:4.0-rc-management
     container_name: rabbitmq
     restart: always
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 5
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
+
 
   elasticsearch:
     image: elasticsearch:8.15.1
     container_name: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
     ports:
-      - "9200:9200"
+      - '9200:9200'
     environment:
       - xpack.security.enabled=false
       # To resolve virtual memory allocation limits on startup
@@ -63,12 +142,12 @@ services:
     image: kibana:8.15.1
     container_name: kibana
     ports:
-      - "5601:5601"
-
-    
+      - '5601:5601'
+    depends_on:
+      - elasticsearch
 
 volumes:
-  chat_system_vol:
+  chat_system_db_vol:
     driver: local
   chat_system_redis_vol:
     driver: local
