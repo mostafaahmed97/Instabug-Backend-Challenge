@@ -67,6 +67,8 @@ The following containers will start:
 - Kibana, GUI for Elasticsearch
   - Accessible at `5601`
 
+PS: If Elasticsearch crashes with exit 137, you might want to increase the memory limit available for docker containers. See [here](https://docs.docker.com/desktop/settings/windows/)
+
 # Database
 
 ## ERD
