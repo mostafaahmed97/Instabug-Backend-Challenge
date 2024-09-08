@@ -150,3 +150,4 @@ DEL   /applications/{token}/chats/{chat_number}/messages/{message_number}
 
 - [] Improve image of RoR to be in production mode
 - [] Add swagger
+- [] Perform batch from message queue
